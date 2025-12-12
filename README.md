@@ -1,6 +1,6 @@
 💻 Project Overview
 
-Phase 5 WhatsApp Bot is a modular, advanced WhatsApp automation bot built with Baileys.
+DARKCORE-XM is a modular, advanced WhatsApp automation bot built with Baileys.
 It is designed to provide a complete WhatsApp bot experience with:
 
 Owner/Admin commands
