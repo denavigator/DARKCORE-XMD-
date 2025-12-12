@@ -1,7 +1,7 @@
 {
-  "name": "phase5-whatsapp-bot",
+  "name": "DARKCORE-XMD",
   "version": "1.0.0",
-  "description": "Phase 5 WhatsApp bot using SESSION_ID and PHONE_NUMBER",
+  "description": "A Whatsapp bot using SESSION_ID and PHONE_NUMBER",
   "main": "index.js",
   "type": "module",
   "scripts": { "start": "node index.js" },
