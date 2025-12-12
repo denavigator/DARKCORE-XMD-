@@ -136,8 +136,7 @@ AUTO_RECONNECT
 
 
 
-git clone https://github.com/YOUR_USERNAME/Phase5-WhatsApp-Bot.git
-cd Phase5-WhatsApp-Bot
+git clone https://github.com/denavigator/DARKCORE-XMD
 
 2. Install dependencies:
 
