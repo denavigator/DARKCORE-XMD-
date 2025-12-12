@@ -1,1 +1,112 @@
-{  "ai": { "enabled": true, "model": "gpt-4-mini", "apiKey": "" },  "mode": { "private": false, "public": true },  "features": {    "antiViewOnce": true,    "antiDelete": true,    "antiLink": true,    "tagAll": true,    "stickerMaker": true,    "welcomeMessage": true,    "autoStatusSave": true,    "autoRead": true,    "autoReconnect": true  },  "messages": {    "antiDelete": "Someone deleted a message 鈥� recovered 馃攧",    "antiLinkWarning": "Group links are not allowed!",    "noPermission": "You don't have permission.",    "welcome": "Welcome!",    "ownerOnly": "Owner only command"  },  "owner": { "number": "256XXXXXXXXX", "prefix": "!" }}
+require("dotenv").config();
+
+// ------------------ CONFIG ------------------
+const PREFIX = ".";
+const OWNER_NUMBERS = ["YOUR_NUMBER_HERE@s.whatsapp.net"];
+const BAD_WORDS = ["sex","porn","scam","fraud"];
+
+// ------------------ DATABASE ------------------
+let db = {
+    users: {},
+    aiMode: {},
+    mutedGroups: {},
+    banned: []
+};
+
+// Save DB
+function saveDB() {
+    const fs = require("fs");
+    fs.writeFileSync("./db.json", JSON.stringify(db, null, 2));
+}
+
+// ------------------ HELPERS ------------------
+
+// Check if user is owner
+function isOwner(number) {
+    return OWNER_NUMBERS.includes(number);
+}
+
+// Check if user is premium
+function isPremium(user) {
+    if (!db.users[user]) return false;
+    return db.users[user].premium || false;
+}
+
+// Format XP/Level info
+function getLevelInfo(user) {
+    if (!db.users[user]) return { xp:0, level:1 };
+    return db.users[user];
+}
+
+// Check for bad words
+function containsBadWord(text) {
+    return BAD_WORDS.some(w => text.toLowerCase().includes(w));
+}
+
+// Daily reward check
+function canClaimDaily(user) {
+    if (!db.users[user]) return true;
+    const now = new Date();
+    const last = db.users[user].lastDaily ? new Date(db.users[user].lastDaily) : null;
+    if (last && now - last < 24*60*60*1000) return false;
+    return true;
+}
+
+// Add XP
+function addXP(user, amount = 10) {
+    if (!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
+    db.users[user].xp += amount;
+    if(db.users[user].xp>=db.users[user].level*100){db.users[user].level+=1;db.users[user].xp=0;}
+    saveDB();
+}
+
+// Add coins
+function addCoins(user, amount = 10) {
+    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
+    db.users[user].coins+=amount;
+    saveDB();
+}
+
+// Daily reward claim
+function claimDaily(user) {
+    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
+    const now = new Date();
+    const last = db.users[user].lastDaily ? new Date(db.users[user].lastDaily) : null;
+    if(last && now-last < 24*60*60*1000) return false;
+    db.users[user].coins+=100;
+    db.users[user].lastDaily=now.toISOString();
+    saveDB();
+    return true;
+}
+
+// Set premium
+function setPremium(user,status=true) {
+    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
+    db.users[user].premium=status;
+    saveDB();
+}
+
+// Add badge
+function addBadge(user,badge){
+    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
+    db.users[user].badge=badge;
+    saveDB();
+}
+
+module.exports = {
+    PREFIX,
+    OWNER_NUMBERS,
+    BAD_WORDS,
+    db,
+    isOwner,
+    isPremium,
+    getLevelInfo,
+    containsBadWord,
+    canClaimDaily,
+    addXP,
+    addCoins,
+    claimDaily,
+    setPremium,
+    addBadge,
+    saveDB
+};
