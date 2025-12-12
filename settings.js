@@ -1,11 +1,11 @@
 module.exports = {
     // ------------------ BOT INFO ------------------
-    BOT_NAME: "Phase5Bot",                   // Bot display name
+    BOT_NAME: "DARKCORE-XMD",                   // Bot display name
     BOT_VERSION: "5.0.0",                    // Bot version
     PREFIX: ".",                             // Default command prefix
 
     // ------------------ OWNER CONFIG ------------------
-    OWNER_NUMBERS: ["YOUR_NUMBER_HERE@s.whatsapp.net"], // Replace with your WhatsApp number(s)
+    OWNER_NUMBERS: ["256758715404"], // Replace with your WhatsApp number(s)
     SUPPORT_GROUP: "group-id@s.whatsapp.net",           // Optional support group ID
 
     // ------------------ FILTER & SECURITY ------------------
