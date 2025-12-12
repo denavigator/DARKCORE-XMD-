@@ -1,6 +1,6 @@
 💻 Project Overview
 
-DARKCORE-XM is a modular, advanced WhatsApp automation bot built with Baileys.
+DARKCORE-XMD is a modular, advanced WhatsApp automation bot built with Baileys.
 It is designed to provide a complete WhatsApp bot experience with:
 
 Owner/Admin commands
