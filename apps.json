@@ -1,9 +1,12 @@
-require("dotenv").config();
+const fs = require("fs");
+const settings = require("./settings.js");
 
 // ------------------ CONFIG ------------------
-const PREFIX = ".";
-const OWNER_NUMBERS = ["YOUR_NUMBER_HERE@s.whatsapp.net"];
-const BAD_WORDS = ["sex","porn","scam","fraud"];
+const PREFIX = settings.PREFIX;
+const OWNER_NUMBERS = settings.OWNER_NUMBERS;
+const BAD_WORDS = settings.BAD_WORDS;
+const SESSION_ID = settings.SESSION_ID;
+const PHONE_NUMBER = settings.PHONE_NUMBER;
 
 // ------------------ DATABASE ------------------
 let db = {
@@ -13,15 +16,23 @@ let db = {
     banned: []
 };
 
-// Save DB
+// Load existing database if exists
+if (fs.existsSync("./db.json")) {
+    try {
+        db = JSON.parse(fs.readFileSync("./db.json"));
+    } catch (e) {
+        console.error("❌ Failed to load db.json, starting fresh");
+    }
+}
+
+// Save database
 function saveDB() {
-    const fs = require("fs");
     fs.writeFileSync("./db.json", JSON.stringify(db, null, 2));
 }
 
 // ------------------ HELPERS ------------------
 
-// Check if user is owner
+// Check if a user is owner
 function isOwner(number) {
     return OWNER_NUMBERS.includes(number);
 }
@@ -32,9 +43,9 @@ function isPremium(user) {
     return db.users[user].premium || false;
 }
 
-// Format XP/Level info
+// Get user XP and level
 function getLevelInfo(user) {
-    if (!db.users[user]) return { xp:0, level:1 };
+    if (!db.users[user]) return { xp: 0, level: 1 };
     return db.users[user];
 }
 
@@ -48,56 +59,63 @@ function canClaimDaily(user) {
     if (!db.users[user]) return true;
     const now = new Date();
     const last = db.users[user].lastDaily ? new Date(db.users[user].lastDaily) : null;
-    if (last && now - last < 24*60*60*1000) return false;
+    if (last && now - last < 24 * 60 * 60 * 1000) return false;
     return true;
 }
 
 // Add XP
-function addXP(user, amount = 10) {
-    if (!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
+function addXP(user, amount = settings.XP_GAIN) {
+    if (!db.users[user]) db.users[user] = { xp: 0, level: 1, coins: 0, premium: false, badge: settings.DEFAULT_BADGE, lastDaily: null };
     db.users[user].xp += amount;
-    if(db.users[user].xp>=db.users[user].level*100){db.users[user].level+=1;db.users[user].xp=0;}
+    if (db.users[user].xp >= db.users[user].level * settings.LEVEL_MULTIPLIER) {
+        db.users[user].level += 1;
+        db.users[user].xp = 0;
+    }
     saveDB();
 }
 
 // Add coins
-function addCoins(user, amount = 10) {
-    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
-    db.users[user].coins+=amount;
+function addCoins(user, amount = settings.COINS_GAIN) {
+    if (!db.users[user]) db.users[user] = { xp: 0, level: 1, coins: 0, premium: false, badge: settings.DEFAULT_BADGE, lastDaily: null };
+    db.users[user].coins += amount;
     saveDB();
 }
 
-// Daily reward claim
+// Claim daily reward
 function claimDaily(user) {
-    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
+    if (!db.users[user]) db.users[user] = { xp: 0, level: 1, coins: 0, premium: false, badge: settings.DEFAULT_BADGE, lastDaily: null };
     const now = new Date();
     const last = db.users[user].lastDaily ? new Date(db.users[user].lastDaily) : null;
-    if(last && now-last < 24*60*60*1000) return false;
-    db.users[user].coins+=100;
-    db.users[user].lastDaily=now.toISOString();
+    if (last && now - last < 24 * 60 * 60 * 1000) return false;
+    db.users[user].coins += settings.DAILY_COINS;
+    db.users[user].lastDaily = now.toISOString();
     saveDB();
     return true;
 }
 
 // Set premium
-function setPremium(user,status=true) {
-    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
-    db.users[user].premium=status;
+function setPremium(user, status = true) {
+    if (!db.users[user]) db.users[user] = { xp: 0, level: 1, coins: 0, premium: false, badge: settings.DEFAULT_BADGE, lastDaily: null };
+    db.users[user].premium = status;
     saveDB();
 }
 
 // Add badge
-function addBadge(user,badge){
-    if(!db.users[user]) db.users[user]={xp:0,level:1,coins:0,premium:false,badge:"NEWBIE",lastDaily:null};
-    db.users[user].badge=badge;
+function addBadge(user, badge) {
+    if (!db.users[user]) db.users[user] = { xp: 0, level: 1, coins: 0, premium: false, badge: settings.DEFAULT_BADGE, lastDaily: null };
+    db.users[user].badge = badge;
     saveDB();
 }
 
+// Export everything
 module.exports = {
     PREFIX,
     OWNER_NUMBERS,
     BAD_WORDS,
+    SESSION_ID,
+    PHONE_NUMBER,
     db,
+    saveDB,
     isOwner,
     isPremium,
     getLevelInfo,
@@ -108,5 +126,5 @@ module.exports = {
     claimDaily,
     setPremium,
     addBadge,
-    saveDB
+    settings
 };
