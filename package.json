@@ -1,15 +1,1 @@
-{
-  "name": "DARKCORE-XMD",
-  "version": "1.0.0",
-  "description": "A Whatsapp bot using SESSION_ID and PHONE_NUMBER",
-  "main": "index.js",
-  "type": "module",
-  "scripts": { "start": "node index.js" },
-  "dependencies": {
-    "@whiskeysockets/baileys": "^5.0.0",
-    "axios": "^1.5.0",
-    "ytdl-core": "^4.11.1",
-    "node-gtts": "^2.0.0",
-    "pino": "^8.0.0"
-  }
-}
+
